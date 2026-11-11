@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UEFA Bajnokok Ligája - Informatika Atestat Projekt</title>
+    <!-- Google Fonts: Montserrat & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Ikonok -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================================================
+           1. CSS VÁLTOZÓK ÉS ALAPBEÁLLÍTÁSOK (UEFA COLOR PALETTE)
+           ========================================================================== */
+        :root {
+            --ucl-bg-dark: #050b18;
+            --ucl-card-bg: rgba(14, 26, 54, 0.75);
+            --ucl-card-border: rgba(214, 175, 55, 0.25);
+            --ucl-blue-main: #0e2a47;
+            --ucl-blue-glow: #1d4ed8;
+            --ucl-cyan-accent: #00f0ff;
+            --ucl-gold: #d4af37;
+            --ucl-gold-light: #fef08a;
+            --ucl-text-light: #f8fafc;
+            --ucl-text-muted: #94a3b8;
+            --white: #ffffff;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-glow: 0 0 25px rgba(0, 240, 255, 0.15);
+            --shadow-gold: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--ucl-bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(30, 58, 138, 0.3) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.15) 0%, transparent 40%);
+            background-attachment: fixed;
+            color: var(--ucl-text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, .brand-logo {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* ==========================================================================
+           2. FEJLÉC ÉS NAVIGÁCIÓ (SINGLE PAGE MULTI-VIEW LINKELÉS)
+           ========================================================================== */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 11, 24, 0.95);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--ucl-card-border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .navbar {
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--white);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        .brand-logo i {
+            color: var(--ucl-gold);
+            font-size: 1.8rem;
+            filter: drop-shadow(0 0 8px var(--ucl-gold));
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.25rem;
+            color: var(--ucl-text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item a:hover {
+            color: var(--ucl-gold-light);
+            background: rgba(212, 175, 55, 0.1);
+            border-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .nav-item a.active {
+            color: var(--white);
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.7), rgba(14, 42, 71, 0.9));
+            border-color: var(--ucl-gold);
+            box-shadow: var(--shadow-gold);
+        }
+
+        /* ==========================================================================
+           3. TARTALMI KONTÉNER ÉS OLDAL VÁLTÁSOK
+           ========================================================================== */
+        main {
+            flex: 1;
+            max-width: 1250px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .page-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--ucl-card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--ucl-card-border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid var(--ucl-gold);
+            padding-bottom: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--ucl-gold);
+        }
+
+        /* ==========================================================================
+           4. STÍLUSOK ELEMEKRE
+           ========================================================================== */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: center;
+            padding: 3rem;
+            background: linear-gradient(135deg, rgba(14, 42, 71, 0.9), rgba(5, 11, 24, 0.95)), 
+                        url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80') center/cover;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--ucl-gold);
+            box-shadow: var(--shadow-gold);
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-title {
+            font-size: 2.75rem;
+            line-height: 1.15;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        .hero-title span {
+            color: var(--ucl-gold);
+            display: block;
+            font-size: 2.2rem;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--ucl-text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .hero-img {
+            width: 100%;
+            height: 340px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--ucl-gold);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #d4af37, #b8860b);
+            color: #050b18;
+            font-weight: 700;
+            padding: 0.85rem 1.75rem;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 22px rgba(212, 175, 55, 0.5);
+            background: linear-gradient(135deg, #fef08a, #d4af37);
+        }
+
+        /* Számozatlan Lista */
+        .unordered-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .unordered-list li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+            color: var(--ucl-text-light);
+        }
+
+        .unordered-list li::before {
+            content: "\f005";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: var(--ucl-gold);
+            font-size: 1.1rem;
+        }
+
+        /* Számozott Lista */
+        .ordered-list {
+            counter-reset: ucl-counter;
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+
+        .ordered-list li {
+            counter-increment: ucl-counter;
+            position: relative;
+            padding-left: 3.5rem;
+            margin-bottom: 1.75rem;
+            font-size: 1.05rem;
+        }
+
+        .ordered-list li::before {
+            content: counter(ucl-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--ucl-gold), #85581a);
+            color: var(--ucl-bg-dark);
+            font-weight: 800;
+            font-size: 1.1rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Táblázat */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--ucl-card-border);
+        }
+
+        .ucl-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: rgba(5, 11, 24, 0.6);
+        }
+
+        .ucl-table th {
+            background: linear-gradient(90deg, #0e2a47, #1e3a8a);
+            color: var(--ucl-gold-light);
+            padding: 1.1rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--ucl-gold);
+        }
+
+        .ucl-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--ucl-text-light);
+            font-size: 0.98rem;
+        }
+
+        .ucl-table tbody tr {
+            transition: var(--transition);
+        }
+
+        .ucl-table tbody tr:hover {
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .badge-trophy {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--ucl-gold);
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            font-weight: 700;
+            border: 1px solid var(--ucl-gold);
+        }
+
+        /* Rekordok & Külső Linkek Grid */
+        .records-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .record-card {
+            background: rgba(5, 11, 24, 0.6);
+            border: 1px solid var(--ucl-card-border);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .record-card:hover {
+            border-color: var(--ucl-gold);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .record-card i {
+            font-size: 2.2rem;
+            color: var(--ucl-gold);
+            margin-bottom: 0.75rem;
+        }
+
+        .record-card h4 {
+            color: var(--ucl-text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .record-card .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--white);
+        }
+
+        .record-card .desc {
+            font-size: 0.85rem;
+            color: var(--ucl-gold-light);
+            margin-top: 0.25rem;
+        }
+
+        .external-links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .ext-link-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem;
+            background: rgba(5, 11, 24, 0.6);
+            border: 1px solid var(--ucl-card-border);
+            border-radius: var(--radius-md);
+            color: var(--white);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .ext-link-card:hover {
+            border-color: var(--ucl-gold);
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateX(6px);
+        }
+
+        .ext-link-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ext-link-info i {
+            font-size: 1.75rem;
+            color: var(--ucl-gold);
+        }
+
+        /* ==========================================================================
+           5. FOOTER / LÁBLÉC (KÖVETELMÉNY 5)
+           ========================================================================== */
+        footer {
+            background: #030712;
+            border-top: 1px solid var(--ucl-card-border);
+            padding: 2.5rem 1.5rem 1.5rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1250px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-brand p {
+            color: var(--ucl-text-muted);
+            margin-top: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .footer-title {
+            color: var(--ucl-gold);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: var(--ucl-text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .footer-links a:hover {
+            color: var(--ucl-gold);
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--ucl-card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-icon:hover {
+            background: var(--ucl-gold);
+            color: var(--ucl-bg-dark);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            max-width: 1250px;
+            margin: 0 auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+            color: var(--ucl-text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Reszponzív Design */
+        @media (max-width: 900px) {
+            .hero, .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero-img {
+                height: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================================================
+         NAVIGÁCIÓS FEJLÉC (KÖVETELMÉNY 1: Oldalak közötti hyperlink kapcsolatok)
+         ========================================================================== -->
+    <header>
+        <nav class="navbar">
+            <a href="#fooldal" class="brand-logo" onclick="switchPage('fooldal')">
+                <i class="fa-solid fa-trophy"></i> Champions League
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#fooldal" id="nav-fooldal" class="active" onclick="switchPage('fooldal')">
+                        <i class="fa-solid fa-house"></i> Főoldal
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#tortenet" id="nav-tortenet" onclick="switchPage('tortenet')">
+                        <i class="fa-solid fa-book-open"></i> Történet
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#gyoztesek" id="nav-gyoztesek" onclick="switchPage('gyoztesek')">
+                        <i class="fa-solid fa-award"></i> Győztesek & Rekordok
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#himnusz" id="nav-himnusz" onclick="switchPage('himnusz')">
+                        <i class="fa-solid fa-music"></i> Himnusz & Döntők
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- ==========================================================================
+         FŐ TARTALMI KONTÉNER (4 MŰKÖDŐ OLDAL SZEKCIÓ)
+         ========================================================================== -->
+    <main>
+
+        <!-- OLDAL 1: FŐOLDAL (#fooldal) -->
+        <section id="fooldal" class="page-content active">
+            <div class="hero">
+                <div>
+                    <h1 class="hero-title">
+                        UEFA <span>Bajnokok Ligája</span>
+                    </h1>
+                    <p class="hero-desc">
+                        A világ legrangosabb klubfutball-tornája, ahol Európa legnagyobb bajnokcsapatai és legfényesebb csillagai küzdenek a halhatatlanságért.
+                    </p>
+                    <a href="#gyoztesek" class="btn" onclick="switchPage('gyoztesek')">
+                        <i class="fa-solid fa-trophy"></i> Bajnokok megtekintése
+                    </a>
+                </div>
+                <div>
+                    <!-- KÉP 1 (KÖVETELMÉNY 2) -->
+                    <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80" alt="Bajnokok Ligája Serleg és Stadion" class="hero-img">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-star"></i> Miért a világ legrangosabb tornája?
+                </h2>
+                <p>
+                    Az UEFA Bajnokok Ligája (angolul: <em>UEFA Champions League</em>) nem csupán egy labdarúgó-torna, hanem a sportvilág egyik legnézettebb és legértékesebb eseménysorozata.
+                </p>
+
+                <!-- SZÁMOZATLAN LISTA (KÖVETELMÉNY 4) -->
+                <ul class="unordered-list">
+                    <li><strong>A legmagasabb színvonal:</strong> A kontinens legerősebb bajnokságainak elit csapatai mérkőznek meg egymással.</li>
+                    <li><strong>Az ikonikus BL-himnusz:</strong> Tony Britten 1992-es szerzeménye, amely minden mérkőzés előtt felcsendül.</li>
+                    <li><strong>A "Csillaglabda" arculat:</strong> A mágikus villanyfényes kedd és szerda esték egyedülálló hangulata.</li>
+                    <li><strong>Globális nézettség:</strong> A döntőket rendszerint több mint 300 millió ember követi figyelemmel világszerte.</li>
+                    <li><strong>A nagy fülű serleg:</strong> A 73 cm magas ezüst trófea, melyet minden profi labdarúgó meg akar nyerni.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- OLDAL 2: TÖRTÉNET (#tortenet) -->
+        <section id="tortenet" class="page-content">
+            <div class="card">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-timeline"></i> A BEK-től a Bajnokok Ligájáig
+                </h2>
+                <p>
+                    A torna története 1955-ben kezdődött a francia L'Équipe újságírója, Gabriel Hanot kezdeményezésére. Eredetileg <strong>Bajnokcsapatok Európa-kupája (BEK)</strong> néven indult el, egyenes kieséses rendszerben.
+                </p>
+
+                <!-- KÉP 2 (KÖVETELMÉNY 2) -->
+                <div style="margin: 1.5rem 0;">
+                    <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1200&q=80" alt="Futball Stadion Esti Fényben" class="hero-img" style="height: 280px;">
+                </div>
+
+                <h3>Főbb mérföldkövek a torna történetében:</h3>
+
+                <!-- SZÁMOZOTT LISTA (KÖVETELMÉNY 4) -->
+                <ol class="ordered-list">
+                    <li>
+                        <strong>1955 - A kezdetek:</strong> Megrendezik az első BEK szezont 16 csapat részvételével. Az első győztes a spanyol Real Madrid lett.
+                    </li>
+                    <li>
+                        <strong>1960 - A Real Madrid 5-ös szériája:</strong> A spanyol óriás megnyeri az első 5 kiírást. A felejthetetlen 1960-as glasgow-i döntőben 7-3-ra győzték le az Eintracht Frankfurtot Puskás Ferenc 4 góljával.
+                    </li>
+                    <li>
+                        <strong>1992 - A megújulás (UEFA Champions League):</strong> Hivatalosan is megalakul a mai Bajnokok Ligája. Bevezetik a csoportkört, az új logót és a legendás himnuszt.
+                    </li>
+                    <li>
+                        <strong>2017 - Történelmi címvédés a BL-érában:</strong> A Real Madrid az első csapat, amelynek sikerül a megújult BL-ben megvédenie a címét (majd 2018-ban zsinórban harmadszor is nyerni).
+                    </li>
+                    <li>
+                        <strong>2024 - Az új ligarendszer:</strong> Megszűnik a hagyományos 32 csapatos csoportkör, helyét a 36 csapatos egységes ligarendszer vesz át.
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- OLDAL 3: GYŐZTESEK & REKORDOK (#gyoztesek) -->
+        <section id="gyoztesek" class="page-content">
+            <div class="card">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-trophy"></i> A Bajnokok Ligája Legsikeresebb Klubjai
+                </h2>
+                <p>
+                    Az alábbi táblázat tartalmazza a BEK és Bajnokok Ligája történetének legeredményesebb klubjait, a megnyert trófeák és az ezüstérmes szereplések számával.
+                </p>
+
+                <!-- TÁBLÁZAT (KÖVETELMÉNY 3) -->
+                <div class="table-container">
+                    <table class="ucl-table">
+                        <thead>
+                            <tr>
+                                <th>Klub</th>
+                                <th>Ország</th>
+                                <th>Győzelmek</th>
+                                <th>Döntők</th>
+                                <th>Győztes Évek</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong><i class="fa-solid fa-crown" style="color: #d4af37;"></i> Real Madrid</strong></td>
+                                <td>Spanyolország</td>
+                                <td><span class="badge-trophy">15</span></td>
+                                <td>18</td>
+                                <td>1956, 1957, 1958, 1959, 1960, 1966, 1998, 2000, 2002, 2014, 2016, 2017, 2018, 2022, 2024</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AC Milan</strong></td>
+                                <td>Olaszország</td>
+                                <td><span class="badge-trophy">7</span></td>
+                                <td>11</td>
+                                <td>1963, 1969, 1989, 1990, 1994, 2003, 2007</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FC Bayern München</strong></td>
+                                <td>Németország</td>
+                                <td><span class="badge-trophy">6</span></td>
+                                <td>11</td>
+                                <td>1974, 1975, 1976, 2001, 2013, 2020</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Liverpool FC</strong></td>
+                                <td>Anglia</td>
+                                <td><span class="badge-trophy">6</span></td>
+                                <td>10</td>
+                                <td>1977, 1978, 1981, 1984, 2005, 2019</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FC Barcelona</strong></td>
+                                <td>Spanyolország</td>
+                                <td><span class="badge-trophy">5</span></td>
+                                <td>8</td>
+                                <td>1992, 2006, 2009, 2011, 2015</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ajax Amsterdam</strong></td>
+                                <td>Hollandia</td>
+                                <td><span class="badge-trophy">4</span></td>
+                                <td>6</td>
+                                <td>1971, 1972, 1973, 1995</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Inter Milan</strong></td>
+                                <td>Olaszország</td>
+                                <td><span class="badge-trophy">3</span></td>
+                                <td>6</td>
+                                <td>1964, 1965, 2010</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Manchester United</strong></td>
+                                <td>Anglia</td>
+                                <td><span class="badge-trophy">3</span></td>
+                                <td>5</td>
+                                <td>1968, 1999, 2008</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- EGYÉNI REKORDOK KÁRTYÁK -->
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-medal"></i> Egyéni Rekordok</h3>
+                <div class="records-grid">
+                    <div class="record-card">
+                        <i class="fa-solid fa-futbol"></i>
+                        <h4>Legtöbb gól</h4>
+                        <div class="value">140 Gól</div>
+                        <div class="desc">Cristiano Ronaldo</div>
+                    </div>
+                    <div class="record-card">
+                        <i class="fa-solid fa-person-running"></i>
+                        <h4>Legtöbb mérkőzés</h4>
+                        <div class="value">183 Meccs</div>
+                        <div class="desc">Cristiano Ronaldo</div>
+                    </div>
+                    <div class="record-card">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <h4>Legsikeresebb edző</h4>
+                        <div class="value">5 Trófea</div>
+                        <div class="desc">Carlo Ancelotti</div>
+                    </div>
+                    <div class="record-card">
+                        <i class="fa-solid fa-fire"></i>
+                        <h4>1 szezon csúcs</h4>
+                        <div class="value">17 Gól</div>
+                        <div class="desc">C. Ronaldo (2013/14)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OLDAL 4: HIMNUSZ ÉS LEGENDÁS DÖNTŐK (#himnusz) -->
+        <section id="himnusz" class="page-content">
+            <!-- HIMNUSZ KÁRTYA -->
+            <div class="card">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-music"></i> A Bajnokok Ligája Himnusza
+                </h2>
+                <p>
+                    A BL hivatalos himnuszát 1992-ben szerezte <strong>Tony Britten</strong> angol zeneszerző, aki Georg Friedrich Händel <em>"Zadok the Priest"</em> című koronázási művét dolgozta át. A zeneművet a Királyi Filharmonikus Zenekar és a St. Martin-in-the-Fields kórus adja elő.
+                </p>
+                <div style="background: rgba(5, 11, 24, 0.85); padding: 1.5rem; border-left: 4px solid var(--ucl-gold); border-radius: var(--radius-md); margin: 1.5rem 0;">
+                    <h4 style="color: var(--ucl-gold-light); margin-bottom: 0.5rem;"><i class="fa-solid fa-quote-left"></i> Dalszöveg (UEFA hivatalos háromnyelvű refrén):</h4>
+                    <p style="font-style: italic; color: var(--ucl-text-light); line-height: 1.8; font-size: 1.05rem;">
+                        "Ils sont les meilleurs, Sie sind die Besten, These are the champions!<br>
+                        Les grandes équipes, Die besten Mannschaften, The main event!"
+                    </p>
+                </div>
+            </div>
+
+            <!-- LEGENDÁS DÖNTŐK KÁRTYA -->
+            <div class="card">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-fire"></i> Felejthetetlen BL-Döntők
+                </h2>
+                <p style="margin-bottom: 1.5rem;">
+                    A Bajnokok Ligája története során számos drámai, fordulatokban gazdag finálét láthattunk. Íme a legikonikusabb mérkőzések:
+                </p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+                    <!-- Döntő 1 -->
+                    <div style="background: rgba(5, 11, 24, 0.6); padding: 1.25rem; border: 1px solid var(--ucl-card-border); border-radius: var(--radius-md);">
+                        <h3 style="color: var(--ucl-gold); font-size: 1.1rem; margin-bottom: 0.5rem;">
+                            <i class="fa-solid fa-trophy"></i> Isztambul 2005: AC Milan - Liverpool 3-3 (p: 2-3)
+                        </h3>
+                        <p style="font-size: 0.95rem; color: var(--ucl-text-light);">
+                            Az "Isztambuli Csoda". Az AC Milan az első félidőben 3-0-ra vezetett. A Liverpool 6 perc alatt egyenlített a második félidőben, majd Steven Gerrard vezetésével, Jerzy Dudek bravúrjaival megnyerte a trófeát.
+                        </p>
+                    </div>
+
+                    <!-- Döntő 2 -->
+                    <div style="background: rgba(5, 11, 24, 0.6); padding: 1.25rem; border: 1px solid var(--ucl-card-border); border-radius: var(--radius-md);">
+                        <h3 style="color: var(--ucl-gold); font-size: 1.1rem; margin-bottom: 0.5rem;">
+                            <i class="fa-solid fa-trophy"></i> Camp Nou 1999: Man. United - Bayern München 2-1
+                        </h3>
+                        <p style="font-size: 0.95rem; color: var(--ucl-text-light);">
+                            A Bayern a 90. percig 1-0-ra vezetett. Sir Alex Ferguson csapata a hosszabbítás ráadás perceiben, Sheringham és Solskjær góljaival fordított és elhódította a triplázást.
+                        </p>
+                    </div>
+
+                    <!-- Döntő 3 -->
+                    <div style="background: rgba(5, 11, 24, 0.6); padding: 1.25rem; border: 1px solid var(--ucl-card-border); border-radius: var(--radius-md);">
+                        <h3 style="color: var(--ucl-gold); font-size: 1.1rem; margin-bottom: 0.5rem;">
+                            <i class="fa-solid fa-trophy"></i> Lisszabon 2014: Real Madrid - Atlético Madrid 4-1 (h.u.)
+                        </h3>
+                        <p style="font-size: 0.95rem; color: var(--ucl-text-light);">
+                            A madridi házi döntőben az Atlético vezetett a 93. percig, amikor Sergio Ramos fejesével egyenlített a Real Madrid ("92:48"), majd a hosszabbításban megszerzte a 10. BL-győzelmét.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- KÜLSŐ LINKÉK SZEKCIÓ (KÖVETELMÉNY 6) -->
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-globe"></i> Hivatalos Források & Videók</h3>
+                <div class="external-links-list">
+                    <a href="https://www.uefa.com/uefachampionsleague/" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+                        <div class="ext-link-info">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <div>
+                                <strong>UEFA Hivatalos BL Oldala</strong>
+                                <div style="font-size: 0.8rem; color: var(--ucl-text-muted);">uefa.com/uefachampionsleague</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+
+                    <a href="https://hu.wikipedia.org/wiki/UEFA-bajnokok_lig%C3%A1ja" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+                        <div class="ext-link-info">
+                            <i class="fa-brands fa-wikipedia-w"></i>
+                            <div>
+                                <strong>Bajnokok Ligája Wikipedia</strong>
+                                <div style="font-size: 0.8rem; color: var(--ucl-text-muted);">hu.wikipedia.org</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+
+                    <a href="https://www.youtube.com/@UEFA" target="_blank" rel="noopener noreferrer" class="ext-link-card">
+                        <div class="ext-link-info">
+                            <i class="fa-brands fa-youtube"></i>
+                            <div>
+                                <strong>UEFA Hivatalos YouTube Csatorna (Összefoglalók)</strong>
+                                <div style="font-size: 0.8rem; color: var(--ucl-text-muted);">youtube.com/@UEFA</div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         LÁBLÉC / FOOTER (KÖVETELMÉNY 5)
+         ========================================================================== -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="#fooldal" class="brand-logo" onclick="switchPage('fooldal')">
+                    <i class="fa-solid fa-trophy"></i> Champions League
+                </a>
+                <p>
+                    Középiskolai Informatika Atestat Projektoldal. Készült az UEFA Bajnokok Ligája történelmének és rekordjainak bemutatására.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="footer-title">Navigáció</h4>
+                <ul class="footer-links">
+                    <li><a href="#fooldal" onclick="switchPage('fooldal')">Főoldal</a></li>
+                    <li><a href="#tortenet" onclick="switchPage('tortenet')">Történet</a></li>
+                    <li><a href="#gyoztesek" onclick="switchPage('gyoztesek')">Győztesek & Rekordok</a></li>
+                    <li><a href="#himnusz" onclick="switchPage('himnusz')">Himnusz & Döntők</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="footer-title">Kövess minket</h4>
+                <p style="font-size: 0.85rem; color: var(--ucl-text-muted);">Hivatalos UEFA csatornák:</p>
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/ChampionsLeague" target="_blank" class="social-icon" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/championsleague" target="_blank" class="social-icon" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://twitter.com/ChampionsLeague" target="_blank" class="social-icon" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Informatika Atestat Vizsgamunka | UEFA Bajnokok Ligája Rajongói Oldal</p>
+        </div>
+    </footer>
+
+    <!-- ==========================================================================
+         JAVASCRIPT OLDALVÁLTÓ LOGIKA
+         ========================================================================== -->
+    <script>
+        /**
+         * Az oldalak közötti hibátlan váltást kezelő JS függvény.
+         * @param {string} pageId - A megjelenítendő oldal azonosítója ('fooldal', 'tortenet', 'gyoztesek', 'himnusz')
+         */
+        function switchPage(pageId) {
+            // 1. Összes oldal elrejtése
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // 2. Összes navigációs gomb inaktiválása
+            const navLinks = document.querySelectorAll('.nav-item a');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // 3. Kiválasztott oldal megjelenítése
+            const selectedPage = document.getElementById(pageId);
+            if (selectedPage) {
+                selectedPage.classList.add('active');
+            }
+
+            // 4. Kiválasztott navigációs gomb kiemelése
+            const selectedNav = document.getElementById('nav-' + pageId);
+            if (selectedNav) {
+                selectedNav.classList.add('active');
+            }
+
+            // 5. Görgetés az oldal tetejére
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Kezdőoldal és URL azonosító betöltése
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash && ['fooldal', 'tortenet', 'gyoztesek', 'himnusz'].includes(hash)) {
+                switchPage(hash);
+            }
+        });
+    </script>
+</body>
+</html>
